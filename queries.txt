@@ -1,0 +1,18 @@
+a. prices of products
+b. price difference for countries 
+c. price difference within category
+d. price difference for day of week
+e. fluctuation in product prices
+f. price vs. socio-economic factors
+g. prices of two complementary products
+h. prices of two complementary products by city and location
+
+i. compare nutritional data of products
+j. compare nutritional data of products by city
+k. compare nutritional data of products within category
+l. price difference for weekend
+m. nutritional data vs. life expectency 
+n. nutritional data for products over time (product in category, or country)
+o. nutritional data vs. average income
+
+
