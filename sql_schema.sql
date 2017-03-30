@@ -25,6 +25,16 @@ CREATE TABLE IF NOT EXISTS  csi4142project.Date (
 		year 		INTEGER		NOT NULL,
 		weekend		BOOLEAN		NOT NULL);
 
+DROP TABLE IF EXISTS csi4142project.Product;
+CREATE TABLE IF NOT EXISTS  csi4142project.Product (
+		product_key	SERIAL		PRIMARY KEY,
+		product_name	VARCHAR(30)	NOT NULL,
+		category	VARCHAR(30)	NOT NULL,
+		energy 		INTEGER		NOT NULL,
+		carbohydrates	INTEGER		NOT NULL,
+		fat 		INTEGER		NOT NULL,
+		protein		INTEGER		NOT NULL);
+
 DROP TABLE IF EXISTS csi4142project.ProductPrice;
 CREATE TABLE IF NOT EXISTS  csi4142project.ProductPrice (
 		pp_key			INTEGER		NOT NULL,
