@@ -15,7 +15,15 @@ CREATE TABLE IF NOT EXISTS  csi4142project.Location (
 		
 		
 /*	Add Date & Product here	*/
-
+DROP TABLE IF EXISTS csi4142project.Date;
+CREATE TABLE IF NOT EXISTS  csi4142project.Date (
+		date_key	SERIAL		PRIMARY KEY,
+		date		DATE		NOT NULL,
+		day_of_week	INTEGER		NOT NULL,
+		week_in_year 	VARCHAR(30)	NOT NULL,
+		month		INTEGER		NOT NULL,
+		year 		INTEGER		NOT NULL,
+		weekend		BOOLEAN		NOT NULL);
 
 DROP TABLE IF EXISTS csi4142project.ProductPrice;
 CREATE TABLE IF NOT EXISTS  csi4142project.ProductPrice (
