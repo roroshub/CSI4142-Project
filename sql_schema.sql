@@ -42,7 +42,7 @@ CREATE TABLE IF NOT EXISTS  csi4142project.ProductPrice (
 		date_key		INTEGER		NOT NULL,
 		product_key		INTEGER		NOT NULL,
 		location_key	INTEGER		NOT NULL,
-		price 			DOUBLE		NOT NULL,
+		price 			FLOAT		NOT NULL,
 		PRIMARY KEY (pp_key), 
 		FOREIGN KEY(date_key) REFERENCES csi4142project.Date(date_key) ON DELETE RESTRICT ON UPDATE CASCADE, 
 		FOREIGN KEY(product_key) REFERENCES csi4142project.Product(product_key) ON DELETE RESTRICT ON UPDATE CASCADE, 
