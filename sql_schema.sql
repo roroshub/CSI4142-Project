@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS  csi4142project.Location (
 		country 		VARCHAR(30)	NOT NULL,
 		gdp		 		INTEGER		NOT NULL,
 		population 		INTEGER		NOT NULL,
-		life-expectancy	INTEGER		NOT NULL,
+		life_expectancy	INTEGER		NOT NULL,
 		anav_income		FLOAT		NOT NULL);
 		
 		
