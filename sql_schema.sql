@@ -13,18 +13,18 @@ CREATE TABLE IF NOT EXISTS  csi4142project.Location (
 		population 		INTEGER,
 		life_expectancy	INTEGER,
 		anav_income		FLOAT,
-		location_year 	INTEGER		NOT NULL);
+		location_year 	INTEGER);
 		
 		
 DROP TABLE IF EXISTS csi4142project.Date;
 CREATE TABLE IF NOT EXISTS  csi4142project.Date (
 		date_key		SERIAL		PRIMARY KEY,
 		date			DATE		NOT NULL,
-		day_of_week		INTEGER		NOT NULL,
-		week_in_year 	VARCHAR(30)	NOT NULL,
-		month			INTEGER		NOT NULL,
-		year 			INTEGER		NOT NULL,
-		weekend			BOOLEAN		NOT NULL);
+		day_of_week		INTEGER,
+		week_in_year 	VARCHAR(30),
+		month			INTEGER,
+		year 			INTEGER,
+		weekend			BOOLEAN);
 
 		
 DROP TABLE IF EXISTS csi4142project.Product;
@@ -37,7 +37,7 @@ CREATE TABLE IF NOT EXISTS  csi4142project.Product (
 		carbohydrates	INTEGER,
 		fat 			INTEGER,
 		protein			INTEGER
-		product_year	INTEGER		NOT NULL);
+		product_year	INTEGER);
 
 		
 DROP TABLE IF EXISTS csi4142project.ProductPrice;
