@@ -4,14 +4,16 @@ CREATE SCHEMA csi4142project;
 
 DROP TABLE IF EXISTS csi4142project.Location;
 CREATE TABLE IF NOT EXISTS  csi4142project.Location (
-		location_key	INTEGER		PRIMARY KEY,
+		location_skey	SERIAL		PRIMARY KEY,
+		location_key	INTEGER		NOT NULL,
 		location_type	VARCHAR(50)	NOT NULL,
 		city	 		VARCHAR(30)	NOT NULL,
 		country 		VARCHAR(30)	NOT NULL,
-		gdp		 		INTEGER		NOT NULL,
-		population 		INTEGER		NOT NULL,
-		life_expectancy	INTEGER		NOT NULL,
-		anav_income		FLOAT		NOT NULL);
+		gdp		 		INTEGER,
+		population 		INTEGER,
+		life_expectancy	INTEGER,
+		anav_income		FLOAT,
+		location_year 	INTEGER		NOT NULL);
 		
 		
 DROP TABLE IF EXISTS csi4142project.Date;
@@ -27,13 +29,15 @@ CREATE TABLE IF NOT EXISTS  csi4142project.Date (
 		
 DROP TABLE IF EXISTS csi4142project.Product;
 CREATE TABLE IF NOT EXISTS  csi4142project.Product (
-		product_key		INTEGER		PRIMARY KEY,
+		product_skey	SERIAL		PRIMARY KEY,
+		product_key		INTEGER		NOT NULL,
 		product_name	VARCHAR(30)	NOT NULL,
-		category		VARCHAR(30)	NOT NULL,
-		energy 			INTEGER		NOT NULL,
-		carbohydrates	INTEGER		NOT NULL,
-		fat 			INTEGER		NOT NULL,
-		protein			INTEGER		NOT NULL);
+		category		VARCHAR(30),
+		energy 			INTEGER,
+		carbohydrates	INTEGER,
+		fat 			INTEGER,
+		protein			INTEGER
+		product_year	INTEGER		NOT NULL);
 
 		
 DROP TABLE IF EXISTS csi4142project.ProductPrice;
