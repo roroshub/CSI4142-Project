@@ -36,7 +36,7 @@ CREATE TABLE IF NOT EXISTS  csi4142project.Product (
 		energy 			INTEGER,
 		carbohydrates	INTEGER,
 		fat 			INTEGER,
-		protein			INTEGER
+		protein			INTEGER,
 		product_year	INTEGER);
 
 		
