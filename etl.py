@@ -93,6 +93,16 @@ def load_gni_data_set(data):
 
     return dataset
 
+def producthandling(row, namemapping):
+    from datetime import datetime
+
+    date = pygrametl.getvalue(row, 'date', namemapping)
+    # Convert the date from a string to a python `Date` object.
+    date = datetime.strptime(date, '%Y-%m-%d').date()
+    row['product_year'] = date.year
+
+    return row
+
 def locationhandling(row, namemapping):
     from datetime import datetime
 
@@ -140,8 +150,9 @@ locationdim = CachedDimension(
 productdim = CachedDimension(
     name='Product',
     key='product_key',
-    attributes=['product_name'],
-    lookupatts=['product_key'])
+    attributes=['product_name', 'product_year'],
+    lookupatts=['product_key'],
+    rowexpander=producthandling)
 
 datedim = CachedDimension(
     name='Date',
@@ -194,7 +205,8 @@ def main():
         row['pp_key'] = count # FIXME
         row['product_key'] = productdim.ensure(row, {
             'product_key': 'Product Code',
-            'product_name': 'Product Name' })
+            'product_name': 'Product Name',
+            'date': 'Obs Date (yyyy-MM-dd)' })
         row['location_key'] = locationdim.ensure(row, {
             'location_key': 'Location Code',
             'city': 'Location Name',
