@@ -36,6 +36,7 @@ GDP_FILE='API_NY.GDP.MKTP.CD_DS2_en_csv_v2.csv'
 POPULATION_FILE='API_SP.POP.TOTL_DS2_en_csv_v2.csv'
 LIFE_EXPECTANCY_FILE='API_SP.DYN.LE00.IN_DS2_en_csv_v2.csv'
 GNI_FILE='API_NY.GNP.PCAP.CD_DS2_en_csv_v2.csv'
+NUTRITION_FILE='nutrition.csv'
 DB_NAME='csi4142'
 DB_USER='csi4142'
 DB_HOST='localhost'
@@ -45,6 +46,7 @@ DB_PASS=''
 POP_DATA = {}
 LIFE_EXPECTANCY_DATA = {}
 GNI_DATA = {}
+NUTRITION_DATA = {}
 
 
 # Connection to the target data warehouse:
@@ -93,6 +95,14 @@ def load_gni_data_set(data):
 
     return dataset
 
+def load_nutrition_data_set(data):
+    # Load the nutrition dataset into memory as a dictionary.
+    dataset = {}
+    for row in data:
+        dataset[row['product_name']] = row
+
+    return dataset
+
 def producthandling(row, namemapping):
     from datetime import datetime
 
@@ -100,6 +110,22 @@ def producthandling(row, namemapping):
     # Convert the date from a string to a python `Date` object.
     date = datetime.strptime(date, '%Y-%m-%d').date()
     row['product_year'] = date.year
+
+    product_name = pygrametl.getvalue(row, 'product_name', namemapping)
+    # Set the nutrition values
+    if product_name in NUTRITION_DATA:
+        product = NUTRITION_DATA[product_name]
+        row['category'] = product['category']
+        row['energy'] = product['energy']
+        row['carbohydrates'] = product['carbohydrates']
+        row['fat'] = product['fat']
+        row['protein'] = product['protein']
+    else:
+        row['category'] = None
+        row['energy'] = None
+        row['carbohydrates'] = None
+        row['fat'] = None
+        row['protein'] = None
 
     return row
 
@@ -150,7 +176,8 @@ locationdim = CachedDimension(
 productdim = CachedDimension(
     name='Product',
     key='product_key',
-    attributes=['product_name', 'product_year'],
+    attributes=['product_name', 'category', 'energy', 'carbohydrates', 'fat',
+        'protein', 'product_year'],
     lookupatts=['product_key'],
     rowexpander=producthandling)
 
@@ -183,6 +210,8 @@ life_expectancy_data_set = CSVSource(open(LIFE_EXPECTANCY_FILE, 'r', 16384),
                         delimiter=',')
 gni_data_set = CSVSource(open(GNI_FILE, 'r', 16384),
                         delimiter=',')
+nutrition_data_set = CSVSource(open(NUTRITION_FILE, 'r', 16384),
+                        delimiter=',')
 
 data = HashJoiningSource(src1=data_set,
                          src2=gdp_data_set,
@@ -192,6 +221,7 @@ data = HashJoiningSource(src1=data_set,
 POP_DATA = load_pop_data_set(pop_data_set)
 LIFE_EXPECTANCY_DATA = load_life_expectancy_data_set(life_expectancy_data_set)
 GNI_DATA = load_gni_data_set(gni_data_set)
+NUTRITION_DATA = load_nutrition_data_set(nutrition_data_set)
 
 def main():
     # Measure the time taken to perform the ETL process.
