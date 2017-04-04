@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS  csi4142project.Location (
 		location_type	VARCHAR(50)	NOT NULL,
 		city	 		VARCHAR(30)	NOT NULL,
 		country 		VARCHAR(30)	NOT NULL,
-		gdp		 		INTEGER,
+		gdp		 		FLOAT,
 		population 		INTEGER,
 		life_expectancy	INTEGER,
 		anav_income		FLOAT,
@@ -31,7 +31,7 @@ DROP TABLE IF EXISTS csi4142project.Product;
 CREATE TABLE IF NOT EXISTS  csi4142project.Product (
 		product_skey	SERIAL		PRIMARY KEY,
 		product_key		INTEGER		NOT NULL,
-		product_name	VARCHAR(30)	NOT NULL,
+		product_name	VARCHAR(35)	NOT NULL,
 		category		VARCHAR(30),
 		energy 			INTEGER,
 		carbohydrates	INTEGER,
