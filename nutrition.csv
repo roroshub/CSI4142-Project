@@ -1,0 +1,31 @@
+product_name,category,energy,carbohydrates,fat,protein
+"Rice, long grain",Grain Products,699,151,2,14
+"Rice, white, broken",Grain Products,257,55,0.923,5
+"Cornflakes, Kellogg's",Grain Products,109,24,1,2
+"Flour, wheat",Baked Goods,35,73,2,12
+"Flour, maize",Baked Goods,427,91,4,8
+"Bread, white, sliced",Baked Goods,65,25,2,4
+"Beef, minced",Meat,240,0,12,22
+Chicken legs,Meat,364,2,13,29
+Tuna steaks,Fish and Shellfish,85,0,2,15
+Shrimps,Fish and Shellfish,80,0,1,18
+"Sardine, canned",Fish and Shellfish,102,0.297,6,11
+Milk,Dairy,158,18,5,10
+Chicken eggs,Eggs,55,0.343,4,4
+Sunflower oil,Fats and oils,124,0,14,0
+Palm oil,Fats and oils,120,0,14,0
+Soybean oil,Fats and oils,120,0,14,0
+Banana,Fruits,105,27,0.389,1
+Orange,Fruits,71,18,0.303,1
+Apple,Fruits,91,24,0.273,0.482
+Carrots,Vegetables,13,3,0.066,0.279
+Onion,Vegetables,44,10,0.11,1
+Maize,Vegetables,73,17,0.668,2
+"Potatoes, brown",Vegetables,149,34,0.213,3
+Cassave,Vegetables,136,32,0.238,1
+"Beans, white, dried",Vegetables,132,0,0.433,8
+"Sugar, white",Miscellaneous,16,4,0,0
+Cooking Salt,Miscellaneous,0,0,0,0
+"Intant coffee, Nescafe Classic",Beverages,6,1,0,0.248
+"Tea, black",Beverages,4,1,0,0
+Coca Cola / Pepsi Cola,Beverages,140,39,0,0
