@@ -19,7 +19,7 @@ import psycopg2
 #sys.path.append('/home/me/code')
 
 import pygrametl
-from pygrametl.datasources import CSVSource, MergeJoiningSource, SQLSource
+from pygrametl.datasources import CSVSource, HashJoiningSource, SQLSource
 from pygrametl.tables import CachedDimension, SnowflakedDimension,\
     SlowlyChangingDimension, BulkFactTable
 
@@ -32,10 +32,19 @@ DEBUG=True
 ROWS_TO_IMPORT=10
 
 DATA_FILE='Crowd-Sourced_Price_Collection_CSV.csv'
+GDP_FILE='API_NY.GDP.MKTP.CD_DS2_en_csv_v2.csv'
+POPULATION_FILE='API_SP.POP.TOTL_DS2_en_csv_v2.csv'
+LIFE_EXPECTANCY_FILE='API_SP.DYN.LE00.IN_DS2_en_csv_v2.csv'
+GNI_FILE='API_NY.GNP.PCAP.CD_DS2_en_csv_v2.csv'
 DB_NAME='csi4142'
 DB_USER='csi4142'
 DB_HOST='localhost'
 DB_PASS=''
+
+# Global variables used for in-memory stores.
+POP_DATA = {}
+LIFE_EXPECTANCY_DATA = {}
+GNI_DATA = {}
 
 
 # Connection to the target data warehouse:
@@ -57,13 +66,76 @@ def pgcopybulkloader(name, atts, fieldsep, rowsep, nullval, filehandle):
     curs.copy_from(file=filehandle, table=name, sep=fieldsep,
                    null=str(nullval), columns=atts)
 
+def load_pop_data_set(data):
+    # Load the population dataset into memory as a dictionary.
+    # Hard-coded to only load 2012 data.
+    dataset = {}
+    for row in data:
+        dataset[row['\ufeff"Country Name"']] = row['2012']
+
+    return dataset
+
+def load_life_expectancy_data_set(data):
+    # Load the life expectancy dataset into memory as a dictionary.
+    # Hard-coded to only load 2012 data.
+    dataset = {}
+    for row in data:
+        dataset[row['\ufeff"Country Name"']] = row['2012']
+
+    return dataset
+
+def load_gni_data_set(data):
+    # Load the GNI dataset into memory as a dictionary.
+    # Hard-coded to only load 2012 data.
+    dataset = {}
+    for row in data:
+        dataset[row['\ufeff"Country Name"']] = row['2012']
+
+    return dataset
+
+def locationhandling(row, namemapping):
+    from datetime import datetime
+
+    country = row['Country']
+
+    # Set the population value
+    if country in POP_DATA:
+        row['population'] = POP_DATA[country]
+    else:
+        row['population'] = None
+
+    # Set the life expectancy value
+    if country in LIFE_EXPECTANCY_DATA:
+        row['life_expectancy'] = LIFE_EXPECTANCY_DATA[country]
+    else:
+        row['life_expectancy'] = None
+
+    # Set the annual average income value
+    if country in GNI_DATA:
+        row['anav_income'] = GNI_DATA[country]
+    else:
+        row['anav_income'] = None
+
+    date = pygrametl.getvalue(row, 'date', namemapping)
+    # Convert the date from a string to a python `Date` object.
+    date = datetime.strptime(date, '%Y-%m-%d').date()
+    row['location_year'] = date.year
+
+    # The year for which to retrieve the GDP is hard-coded to simplify the ETL
+    # process, and because the data only covers 2012.
+    row['gdp'] = pygrametl.getvalue(row, '2012', namemapping)
+
+    return row
+
 # Data dimensions
 
 locationdim = CachedDimension(
     name='Location',
     key='location_key',
-    attributes=['city', 'country'],
-    lookupatts=['location_key'])
+    attributes=['city', 'country', 'gdp', 'population', 'life_expectancy',
+        'anav_income', 'location_year'],
+    lookupatts=['location_key'],
+    rowexpander=locationhandling)
 
 productdim = CachedDimension(
     name='Product',
@@ -92,10 +164,30 @@ facttbl = BulkFactTable(
 data_set = CSVSource(open(DATA_FILE, 'r', 16384),
                         delimiter=',')
 
+gdp_data_set = CSVSource(open(GDP_FILE, 'r', 16384),
+                        delimiter=',')
+pop_data_set = CSVSource(open(POPULATION_FILE, 'r', 16384),
+                        delimiter=',')
+life_expectancy_data_set = CSVSource(open(LIFE_EXPECTANCY_FILE, 'r', 16384),
+                        delimiter=',')
+gni_data_set = CSVSource(open(GNI_FILE, 'r', 16384),
+                        delimiter=',')
+
+data = HashJoiningSource(src1=data_set,
+                         src2=gdp_data_set,
+                         key1='Country',
+                         key2='\ufeff"Country Name"')
+
+POP_DATA = load_pop_data_set(pop_data_set)
+LIFE_EXPECTANCY_DATA = load_life_expectancy_data_set(life_expectancy_data_set)
+GNI_DATA = load_gni_data_set(gni_data_set)
+
 def main():
-    #[datedim.insert(row) for row in date_source]
+    # Measure the time taken to perform the ETL process.
+    start = time.time()
+
     count = 1
-    for row in data_set:
+    for row in data:
         # Add the missing data to the dimension tables.
         row['date_key'] = datedim.lookup(row, { 'date': 'Obs Date (yyyy-MM-dd)' })
         row['price'] = row['Obs Price']
@@ -106,7 +198,8 @@ def main():
         row['location_key'] = locationdim.ensure(row, {
             'location_key': 'Location Code',
             'city': 'Location Name',
-            'country': 'Country' })
+            'country': 'Country',
+            'date': 'Obs Date (yyyy-MM-dd)' })
 
         # Insert the data into the fact table.
         facttbl.insert(row)
@@ -118,6 +211,9 @@ def main():
         if DEBUG and count > ROWS_TO_IMPORT:
             break
     connection.commit()
+
+    end = time.time()
+    print("ETL operation completed in: {}".format(end - start))
 
 if __name__ == '__main__':
     main()
