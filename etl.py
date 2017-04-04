@@ -57,13 +57,23 @@ def pgcopybulkloader(name, atts, fieldsep, rowsep, nullval, filehandle):
     curs.copy_from(file=filehandle, table=name, sep=fieldsep,
                    null=str(nullval), columns=atts)
 
+def locationhandling(row, namemapping):
+    from datetime import datetime
+
+    date = pygrametl.getvalue(row, 'date', namemapping)
+    # Convert the date from a string to a python `Date` object.
+    date = datetime.strptime(date, '%Y-%m-%d').date()
+    row['location_year'] = date.year
+    return row
+
 # Data dimensions
 
 locationdim = CachedDimension(
     name='Location',
     key='location_key',
-    attributes=['city', 'country'],
-    lookupatts=['location_key'])
+    attributes=['city', 'country', 'location_year'],
+    lookupatts=['location_key'],
+    rowexpander=locationhandling)
 
 productdim = CachedDimension(
     name='Product',
@@ -106,7 +116,8 @@ def main():
         row['location_key'] = locationdim.ensure(row, {
             'location_key': 'Location Code',
             'city': 'Location Name',
-            'country': 'Country' })
+            'country': 'Country',
+            'date': 'Obs Date (yyyy-MM-dd)' })
 
         # Insert the data into the fact table.
         facttbl.insert(row)
