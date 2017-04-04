@@ -73,11 +73,14 @@ database.
 
 * [Main][dataset]
 * [GDP][gdp_dataset]
+* [Population][pop_dataset]
 
 ### Notes
 
-The GDP dataset contains a header which needs to be removed from the CSV file
-prior to the running the ETL script. Do not remove the list of column headers.
+The GDP and Population datasets contain a header which needs to be removed from
+the CSV files prior to the running the ETL script. Do not remove the list of
+column headers from the files.
 
 [dataset]: http://data.worldbank.org/data-catalog/crowd-sourced-price-collection
 [gdp_dataset]: http://data.worldbank.org/indicator/NY.GDP.MKTP.CD
+[pop_dataset]: http://data.worldbank.org/indicator/SP.POP.TOTL

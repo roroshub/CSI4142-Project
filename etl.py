@@ -33,10 +33,14 @@ ROWS_TO_IMPORT=10
 
 DATA_FILE='Crowd-Sourced_Price_Collection_CSV.csv'
 GDP_FILE='API_NY.GDP.MKTP.CD_DS2_en_csv_v2.csv'
+POPULATION_FILE='API_SP.POP.TOTL_DS2_en_csv_v2.csv'
 DB_NAME='csi4142'
 DB_USER='csi4142'
 DB_HOST='localhost'
 DB_PASS=''
+
+# Global variables used for in-memory stores.
+POP_DATA = {}
 
 
 # Connection to the target data warehouse:
@@ -58,8 +62,24 @@ def pgcopybulkloader(name, atts, fieldsep, rowsep, nullval, filehandle):
     curs.copy_from(file=filehandle, table=name, sep=fieldsep,
                    null=str(nullval), columns=atts)
 
+def load_pop_data_set(data):
+    # Load the population dataset into memory as a dictionary.
+    # Hard-coded to only load 2012 data.
+    dataset = {}
+    for row in data:
+        dataset[row['\ufeff"Country Name"']] = row['2012']
+
+    return dataset
+
 def locationhandling(row, namemapping):
     from datetime import datetime
+
+    # Set the population value
+    country = row['Country']
+    if country in POP_DATA:
+        row['population'] = POP_DATA[country]
+    else:
+        row['population'] = None
 
     date = pygrametl.getvalue(row, 'date', namemapping)
     # Convert the date from a string to a python `Date` object.
@@ -77,7 +97,7 @@ def locationhandling(row, namemapping):
 locationdim = CachedDimension(
     name='Location',
     key='location_key',
-    attributes=['city', 'country', 'gdp', 'location_year'],
+    attributes=['city', 'country', 'gdp', 'population', 'location_year'],
     lookupatts=['location_key'],
     rowexpander=locationhandling)
 
@@ -110,11 +130,15 @@ data_set = CSVSource(open(DATA_FILE, 'r', 16384),
 
 gdp_data_set = CSVSource(open(GDP_FILE, 'r', 16384),
                         delimiter=',')
+pop_data_set = CSVSource(open(POPULATION_FILE, 'r', 16384),
+                        delimiter=',')
 
 data = HashJoiningSource(src1=data_set,
                          src2=gdp_data_set,
                          key1='Country',
                          key2='\ufeff"Country Name"')
+
+POP_DATA = load_pop_data_set(pop_data_set)
 
 def main():
     # Measure the time taken to perform the ETL process.
