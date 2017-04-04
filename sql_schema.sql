@@ -5,8 +5,8 @@ CREATE SCHEMA csi4142project;
 DROP TABLE IF EXISTS csi4142project.Location;
 CREATE TABLE IF NOT EXISTS  csi4142project.Location (
 		location_skey	SERIAL		PRIMARY KEY,
-		location_key	INTEGER		NOT NULL,
-		location_type	VARCHAR(50)	NOT NULL,
+		location_key	INTEGER		NOT NULL UNIQUE,
+		location_type	VARCHAR(30)	NOT NULL,
 		city	 		VARCHAR(30)	NOT NULL,
 		country 		VARCHAR(30)	NOT NULL,
 		gdp		 		FLOAT,
@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS  csi4142project.Date (
 DROP TABLE IF EXISTS csi4142project.Product;
 CREATE TABLE IF NOT EXISTS  csi4142project.Product (
 		product_skey	SERIAL		PRIMARY KEY,
-		product_key		INTEGER		NOT NULL,
+		product_key		INTEGER		NOT NULL UNIQUE,
 		product_name	VARCHAR(35)	NOT NULL,
 		category		VARCHAR(30),
 		energy 			INTEGER,
