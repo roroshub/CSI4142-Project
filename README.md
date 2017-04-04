@@ -75,7 +75,7 @@ database.
 * [GNI][gni_dataset]
 * [GDP][gdp_dataset]
 * [Life expectancy][life_expectancy_dataset]
-* Nutrition (TBD)
+* Nutrition (included in repo)
 * [Population][pop_dataset]
 
 ### Notes

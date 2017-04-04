@@ -34,9 +34,9 @@ CREATE TABLE IF NOT EXISTS  csi4142project.Product (
 		product_name	VARCHAR(35)	NOT NULL,
 		category		VARCHAR(30),
 		energy 			INTEGER,
-		carbohydrates	INTEGER,
-		fat 			INTEGER,
-		protein			INTEGER,
+		carbohydrates	FLOAT,
+		fat 			FLOAT,
+		protein			FLOAT,
 		product_year	INTEGER);
 
 		
