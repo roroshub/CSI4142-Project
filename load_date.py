@@ -11,12 +11,9 @@ import csv, datetime, psycopg2
 # Connect to the PostgreSQL database with the provided info.
 def connect_db(dbname, user, host, password):
     print("Connecting to database")
-    try:
-        conn = psycopg2.connect(dbname=dbname, user=user, host=host, password=password)
-        print("Connected to database")
-        return conn
-    except:
-        print("Error while connecting to database")
+    conn = psycopg2.connect(dbname=dbname, user=user, host=host, password=password)
+    print("Connected to database")
+    return conn
 
 # Loads the data from the main dataset into memory as a set of tuples.
 def load_data_from_file(f):
