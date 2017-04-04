@@ -77,9 +77,15 @@ if __name__ == '__main__':
     with open(DATA_FILE, 'r') as f:
         data = load_data_from_file(f)
 
+    # Filter the data down to just the dates.
+    dates = [entry[6] for entry in data]
+
+    # Ensure there are no duplicate dates in the list.
+    dates = set(dates)
+
     # Parse the dates into the expected format.
     print("Parsing dates to proper format")
-    dates = [parse_date(entry[6]) for entry in data]
+    dates = [parse_date(date) for date in dates]
 
     # Execute the query to insert the data.
     print("Executing query")
