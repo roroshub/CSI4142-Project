@@ -19,7 +19,7 @@ import psycopg2
 #sys.path.append('/home/me/code')
 
 import pygrametl
-from pygrametl.datasources import CSVSource, MergeJoiningSource, SQLSource
+from pygrametl.datasources import CSVSource, HashJoiningSource, SQLSource
 from pygrametl.tables import CachedDimension, SnowflakedDimension,\
     SlowlyChangingDimension, BulkFactTable
 
@@ -32,6 +32,7 @@ DEBUG=True
 ROWS_TO_IMPORT=10
 
 DATA_FILE='Crowd-Sourced_Price_Collection_CSV.csv'
+GDP_FILE='API_NY.GDP.MKTP.CD_DS2_en_csv_v2.csv'
 DB_NAME='csi4142'
 DB_USER='csi4142'
 DB_HOST='localhost'
@@ -64,6 +65,11 @@ def locationhandling(row, namemapping):
     # Convert the date from a string to a python `Date` object.
     date = datetime.strptime(date, '%Y-%m-%d').date()
     row['location_year'] = date.year
+
+    # The year for which to retrieve the GDP is hard-coded to simplify the ETL
+    # process, and because the data only covers 2012.
+    row['gdp'] = pygrametl.getvalue(row, '2012', namemapping)
+
     return row
 
 # Data dimensions
@@ -71,7 +77,7 @@ def locationhandling(row, namemapping):
 locationdim = CachedDimension(
     name='Location',
     key='location_key',
-    attributes=['city', 'country', 'location_year'],
+    attributes=['city', 'country', 'gdp', 'location_year'],
     lookupatts=['location_key'],
     rowexpander=locationhandling)
 
@@ -102,10 +108,20 @@ facttbl = BulkFactTable(
 data_set = CSVSource(open(DATA_FILE, 'r', 16384),
                         delimiter=',')
 
+gdp_data_set = CSVSource(open(GDP_FILE, 'r', 16384),
+                        delimiter=',')
+
+data = HashJoiningSource(src1=data_set,
+                         src2=gdp_data_set,
+                         key1='Country',
+                         key2='\ufeff"Country Name"')
+
 def main():
-    #[datedim.insert(row) for row in date_source]
+    # Measure the time taken to perform the ETL process.
+    start = time.time()
+
     count = 1
-    for row in data_set:
+    for row in data:
         # Add the missing data to the dimension tables.
         row['date_key'] = datedim.lookup(row, { 'date': 'Obs Date (yyyy-MM-dd)' })
         row['price'] = row['Obs Price']
@@ -129,6 +145,9 @@ def main():
         if DEBUG and count > ROWS_TO_IMPORT:
             break
     connection.commit()
+
+    end = time.time()
+    print("ETL operation completed in: {}".format(end - start))
 
 if __name__ == '__main__':
     main()

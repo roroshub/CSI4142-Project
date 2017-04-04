@@ -28,7 +28,7 @@ These instructions assume you are working on Linux.
 
 Loading the dates from the data set into the database:
 
-1. Obtain [the dataset][dataset]
+1. Obtain the [datasets](#datasets)
 2. Ensure python is available and installed
 3. Setup a virtual environment:
 
@@ -69,5 +69,15 @@ database.
     ```sh
     ./etl.py
     ```
+## Datasets
+
+* [Main][dataset]
+* [GDP][gdp_dataset]
+
+### Notes
+
+The GDP dataset contains a header which needs to be removed from the CSV file
+prior to the running the ETL script. Do not remove the list of column headers.
 
 [dataset]: http://data.worldbank.org/data-catalog/crowd-sourced-price-collection
+[gdp_dataset]: http://data.worldbank.org/indicator/NY.GDP.MKTP.CD
