@@ -35,6 +35,7 @@ DATA_FILE='Crowd-Sourced_Price_Collection_CSV.csv'
 GDP_FILE='API_NY.GDP.MKTP.CD_DS2_en_csv_v2.csv'
 POPULATION_FILE='API_SP.POP.TOTL_DS2_en_csv_v2.csv'
 LIFE_EXPECTANCY_FILE='API_SP.DYN.LE00.IN_DS2_en_csv_v2.csv'
+GNI_FILE='API_NY.GNP.PCAP.CD_DS2_en_csv_v2.csv'
 DB_NAME='csi4142'
 DB_USER='csi4142'
 DB_HOST='localhost'
@@ -43,6 +44,7 @@ DB_PASS=''
 # Global variables used for in-memory stores.
 POP_DATA = {}
 LIFE_EXPECTANCY_DATA = {}
+GNI_DATA = {}
 
 
 # Connection to the target data warehouse:
@@ -82,6 +84,15 @@ def load_life_expectancy_data_set(data):
 
     return dataset
 
+def load_gni_data_set(data):
+    # Load the GNI dataset into memory as a dictionary.
+    # Hard-coded to only load 2012 data.
+    dataset = {}
+    for row in data:
+        dataset[row['\ufeff"Country Name"']] = row['2012']
+
+    return dataset
+
 def locationhandling(row, namemapping):
     from datetime import datetime
 
@@ -99,6 +110,12 @@ def locationhandling(row, namemapping):
     else:
         row['life_expectancy'] = None
 
+    # Set the annual average income value
+    if country in GNI_DATA:
+        row['anav_income'] = GNI_DATA[country]
+    else:
+        row['anav_income'] = None
+
     date = pygrametl.getvalue(row, 'date', namemapping)
     # Convert the date from a string to a python `Date` object.
     date = datetime.strptime(date, '%Y-%m-%d').date()
@@ -115,7 +132,8 @@ def locationhandling(row, namemapping):
 locationdim = CachedDimension(
     name='Location',
     key='location_key',
-    attributes=['city', 'country', 'gdp', 'population', 'life_expectancy', 'location_year'],
+    attributes=['city', 'country', 'gdp', 'population', 'life_expectancy',
+        'anav_income', 'location_year'],
     lookupatts=['location_key'],
     rowexpander=locationhandling)
 
@@ -152,6 +170,8 @@ pop_data_set = CSVSource(open(POPULATION_FILE, 'r', 16384),
                         delimiter=',')
 life_expectancy_data_set = CSVSource(open(LIFE_EXPECTANCY_FILE, 'r', 16384),
                         delimiter=',')
+gni_data_set = CSVSource(open(GNI_FILE, 'r', 16384),
+                        delimiter=',')
 
 data = HashJoiningSource(src1=data_set,
                          src2=gdp_data_set,
@@ -160,6 +180,7 @@ data = HashJoiningSource(src1=data_set,
 
 POP_DATA = load_pop_data_set(pop_data_set)
 LIFE_EXPECTANCY_DATA = load_life_expectancy_data_set(life_expectancy_data_set)
+GNI_DATA = load_gni_data_set(gni_data_set)
 
 def main():
     # Measure the time taken to perform the ETL process.

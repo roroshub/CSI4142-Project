@@ -72,16 +72,18 @@ database.
 ## Datasets
 
 * [Main][dataset]
+* [GNI][gni_dataset]
 * [GDP][gdp_dataset]
 * [Life expectancy][life_expectancy_dataset]
 * [Population][pop_dataset]
 
 ### Notes
 
-The GDP, life expectancy, and population datasets contain a header which needs
-to be removed from the CSV files prior to the running the ETL script. Do not
-remove the list of column headers from the files.
+The GDP, GNI, life expectancy, and population datasets contain a header which
+needs to be removed from the CSV files prior to the running the ETL script. Do
+not remove the list of column headers from the files.
 
+[gni_dataset]: http://data.worldbank.org/indicator/NY.GNP.PCAP.CD
 [dataset]: http://data.worldbank.org/data-catalog/crowd-sourced-price-collection
 [gdp_dataset]: http://data.worldbank.org/indicator/NY.GDP.MKTP.CD
 [life_expectancy_dataset]: http://data.worldbank.org/indicator/SP.DYN.LE00.IN
