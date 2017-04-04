@@ -168,8 +168,8 @@ def locationhandling(row, namemapping):
 locationdim = CachedDimension(
     name='Location',
     key='location_key',
-    attributes=['city', 'country', 'gdp', 'population', 'life_expectancy',
-        'anav_income', 'location_year'],
+    attributes=['location_type', 'city', 'country', 'gdp', 'population',
+        'life_expectancy', 'anav_income', 'location_year'],
     lookupatts=['location_key'],
     rowexpander=locationhandling)
 
@@ -241,7 +241,8 @@ def main():
             'location_key': 'Location Code',
             'city': 'Location Name',
             'country': 'Country',
-            'date': 'Obs Date (yyyy-MM-dd)' })
+            'date': 'Obs Date (yyyy-MM-dd)',
+            'location_type': 'Outlet Type' })
 
         # Insert the data into the fact table.
         facttbl.insert(row)
