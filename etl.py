@@ -167,17 +167,17 @@ def locationhandling(row, namemapping):
 
 locationdim = CachedDimension(
     name='Location',
-    key='location_key',
-    attributes=['location_type', 'city', 'country', 'gdp', 'population',
-        'life_expectancy', 'anav_income', 'location_year'],
+    key='location_skey',
+    attributes=['location_type', 'location_key', 'city', 'country', 'gdp',
+        'population', 'life_expectancy', 'anav_income', 'location_year'],
     lookupatts=['location_key'],
     rowexpander=locationhandling)
 
 productdim = CachedDimension(
     name='Product',
-    key='product_key',
-    attributes=['product_name', 'category', 'energy', 'carbohydrates', 'fat',
-        'protein', 'product_year'],
+    key='product_skey',
+    attributes=['product_key', 'product_name', 'category', 'energy',
+        'carbohydrates', 'fat', 'protein', 'product_year'],
     lookupatts=['product_key'],
     rowexpander=producthandling)
 
@@ -233,16 +233,22 @@ def main():
         row['date_key'] = datedim.lookup(row, { 'date': 'Obs Date (yyyy-MM-dd)' })
         row['price'] = row['Obs Price']
         row['pp_key'] = count # FIXME
-        row['product_key'] = productdim.ensure(row, {
+
+        product_skey = productdim.ensure(row, {
             'product_key': 'Product Code',
             'product_name': 'Product Name',
             'date': 'Obs Date (yyyy-MM-dd)' })
-        row['location_key'] = locationdim.ensure(row, {
+        product = productdim.getbykey(product_skey)
+        row['product_key'] = product['product_key']
+
+        location_skey = locationdim.ensure(row, {
             'location_key': 'Location Code',
             'city': 'Location Name',
             'country': 'Country',
             'date': 'Obs Date (yyyy-MM-dd)',
             'location_type': 'Outlet Type' })
+        location = locationdim.getbykey(location_skey)
+        row['location_key'] = location['location_key']
 
         # Insert the data into the fact table.
         facttbl.insert(row)
