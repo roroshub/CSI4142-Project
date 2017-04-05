@@ -2,43 +2,8 @@
 
 import csv, re
 
-#DATA_FILE='Crowd-Sourced_Price_Collection_CSV.csv'
-#OUT_FILE='Kenya_data.csv'
 DATA_FILE='location-kenya.csv'
 OUT_FILE='location-kenya_formatted.csv'
-# If this value is set to an integer, the resulting data will only be output for
-# the outlet code corresponding to this integer.
-OUTLET_CODE=1748
-
-# Loads the data from the main dataset into memory.
-# def load_data_from_file(f):
-#     # Read the file into memory as a list of lines
-#     data = f.readlines()
-# 
-#     reader = csv.DictReader(f)
-# 
-#     dataset = []
-#     for row in reader:
-#         # Strip the loading and trailing characters inserted by PostgreSQL.
-#         row = row[]
-#         # Ignore non-Kenya rows
-#         if row['Country'] != 'Kenya':
-#             continue
-# 
-#         # Strip out the commas from the product names, as they interfere with
-#         # the operation of the Apriori algorithm implemenation used.
-#         product_name = row['Product Name'].replace(',', '')
-# 
-#         # Only load the necessary columns.
-#         data = (
-#             row['Outlet Code'],
-#             row['Obs Date (yyyy-MM-dd)'],
-#             product_name,
-#         )
-# 
-#         dataset.append(data)
-# 
-#     return dataset
 
 def transform_data(data):
     transformed_data = []
@@ -87,8 +52,7 @@ def main():
     print("Writing out transformed data")
     with open(OUT_FILE, 'w') as csvfile:
         writer = csv.writer(csvfile, delimiter=',',
-                            quotechar='', quoting=csv.QUOTE_NONE,
-                            escapechar='\\')
+                            quotechar='', quoting=csv.QUOTE_NONE)
         for row in data:
             writer.writerow(row)
 
