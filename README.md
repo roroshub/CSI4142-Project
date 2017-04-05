@@ -69,6 +69,57 @@ database.
     ```sh
     ./etl.py
     ```
+
+### Analysis with Apriori
+
+This library inclues the [Apriori algorithm implementation][apriori] written by
+asaini.
+
+Per the given instructions, we are only interested in analyzing a subset of the
+data. As such, the relevant data must first be extracted from PostgreSQL.
+
+**NOTE**: extracted data for `location_key` 167 and all `location_key`s in Kenya
+already exist in this repository (see [datasets](#datasets)), so the following
+steps are unnecessary unless you are looking to generate custom data.
+
+Extracting data from PostgreSQL for analysis:
+
+1. Modify the following SQL command as necessary, to get the data for either a
+   specific location, or for the whole country:
+
+    ```sql
+    \copy(
+        SELECT (pr.location_key, d.date, array_to_string(array_agg(p.product_name), '|'))
+        FROM Product p, ProductPrice pr, Date d, Location l
+        WHERE d.date_key = pr.date_key
+            AND p.product_key = pr.product_key
+            AND pr.location_key = l.location_key
+            AND l.country = 'Kenya'
+            AND l.location_key = '167'
+            GROUP BY (pr.locaton_key, d.date)
+    )
+    To
+    '/tmp/location-167.csv' With CSV;
+    ```
+
+2. Extract the data to a temporary file using the above command, modified as
+   necessary.
+3. Normalize the data with the `analysis/transform_data.py` script:
+
+    ```sh
+    ./transform_data.py
+    ```
+
+4. Analyze the data using the included `analysis/apriori.py` script, setting
+   your "support" and "confidence" variables as necessary:
+
+   ```sh
+   ./apriori.py -f location-167_formatted.csv -s 0.94 -c 0.68
+   ```
+
+**NOTE**: the `apriori.py` script, unlike all the other scripts in this repo,
+***REQUIRES*** Python 2 to function.
+
 ## Datasets
 
 * [Main][dataset]
@@ -78,12 +129,18 @@ database.
 * Nutrition (included in repo)
 * [Population][pop_dataset]
 
+The `location-167_formatted.csv` and `location-kenya_formatted.csv` data sets
+are modified representations of the original data set, generated using the
+process described in [analysis with Apriori](#analysis-with-apriori). They are
+provided to reduce the burden on the user.
+
 ### Notes
 
 The GDP, GNI, life expectancy, and population datasets contain a header which
 needs to be removed from the CSV files prior to the running the ETL script. Do
 not remove the list of column headers from the files.
 
+[apriori]: https://github.com/asaini/Apriori
 [gni_dataset]: http://data.worldbank.org/indicator/NY.GNP.PCAP.CD
 [dataset]: http://data.worldbank.org/data-catalog/crowd-sourced-price-collection
 [gdp_dataset]: http://data.worldbank.org/indicator/NY.GDP.MKTP.CD
