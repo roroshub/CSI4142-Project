@@ -104,10 +104,10 @@ Extracting data from PostgreSQL for analysis:
 
 2. Extract the data to a temporary file using the above command, modified as
    necessary.
-3. Normalize the data with the `analysis/transform_data.py` script:
+3. Normalize the data with the `analysis/normalize_data.py` script:
 
     ```sh
-    ./transform_data.py
+    ./normalize_data.py
     ```
 
 4. Analyze the data using the included `analysis/apriori.py` script, setting
